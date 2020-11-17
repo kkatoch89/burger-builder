@@ -6,10 +6,12 @@ import NavigationItems from '../NavigationItems/NavigationItems';
 import Backdrop from '../../UI/Backdrop/Backdrop';
 
 const sideDrawer = (props) => {
-	let attachedClasses = [styles.SideDrawer, styles.Close];
-	if (props.open) {
-		attachedClasses = [styles.SideDrawer, styles.Open];
-	}
+	let attachedClasses = props.open
+		? [styles.SideDrawer, styles.Open]
+		: [styles.SideDrawer, styles.Close];
+	// if (props.open) {
+	// 	attachedClasses = [styles.SideDrawer, styles.Open];
+	// }
 
 	return (
 		<>
@@ -18,7 +20,7 @@ const sideDrawer = (props) => {
 				<div className={styles.Logo}>
 					<Logo />
 				</div>
-				<nav className={styles.DesktopOnly}>
+				<nav>
 					<NavigationItems />
 				</nav>
 			</div>
