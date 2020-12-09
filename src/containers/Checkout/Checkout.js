@@ -15,7 +15,7 @@ class Checkout extends Component {
 		const customIngredients = {};
 		let price = 0;
 		for (let param of query.entries()) {
-			console.log(param);
+			// console.log(param);
 			if (param[0] === 'price') {
 				price = param[1];
 			} else {
