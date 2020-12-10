@@ -14,40 +14,72 @@ class ContactData extends Component {
 				elementConfig: {
 					type: 'text',
 					placeholder: 'Your Name',
+					errorText: 'name',
 				},
 				value: '',
+				validation: {
+					required: true,
+				},
+				valid: false,
+				touched: false,
 			},
 			street: {
 				elementType: 'input',
 				elementConfig: {
 					type: 'text',
 					placeholder: 'Street',
+					errorText: 'street',
 				},
 				value: '',
+				validation: {
+					required: true,
+				},
+				valid: false,
+				touched: false,
 			},
 			postalCode: {
 				elementType: 'input',
 				elementConfig: {
 					type: 'text',
 					placeholder: 'Postal Code',
+					errorText: 'postal code',
 				},
 				value: '',
+				validation: {
+					required: true,
+					minLength: 6,
+					maxLength: 6,
+				},
+				valid: false,
+				touched: false,
 			},
 			country: {
 				elementType: 'input',
 				elementConfig: {
 					type: 'text',
 					placeholder: 'Country',
+					errorText: 'country',
 				},
 				value: '',
+				validation: {
+					required: true,
+				},
+				valid: false,
+				touched: false,
 			},
 			email: {
 				elementType: 'input',
 				elementConfig: {
 					type: 'email',
 					placeholder: 'Your E-Mail',
+					errorText: 'email',
 				},
 				value: '',
+				validation: {
+					required: true,
+				},
+				valid: false,
+				touched: false,
 			},
 			deliveryMethod: {
 				elementType: 'select',
@@ -57,9 +89,12 @@ class ContactData extends Component {
 						{ value: 'cheapest', displayValue: 'Cheapest' },
 					],
 				},
-				value: '',
+				validation: {},
+				valid: true,
+				value: 'fastest',
 			},
 		},
+		formIsValid: false,
 		loading: false,
 	};
 
@@ -87,6 +122,25 @@ class ContactData extends Component {
 			});
 	};
 
+	checkValidity(value, rules) {
+		let isValid = true;
+
+		if (rules.required) {
+			// value.trim() removes white space in the beginning and end
+			isValid = value.trim() !== '' && isValid; // && isValid is to check if isValid was already true
+		}
+
+		if (rules.minlength) {
+			isValid = value.length >= rules.minLength && isValid;
+		}
+
+		if (rules.maxLength) {
+			isValid = value.length <= rules.minLength && isValid;
+		}
+
+		return isValid;
+	}
+
 	inputChangedHandler = (e, inputID) => {
 		// Note that ...this.state.orderForm does not create a deep clone!!!
 		// The nested objects would still be a reference to the original nester objects
@@ -96,8 +150,23 @@ class ContactData extends Component {
 		// Only need to create a deep copy until the level that you are changing value
 		const updatedFormElement = { ...updatedOrderForm[inputID] };
 		updatedFormElement.value = e.target.value;
+		// Checking to see if valid. If valid then true
+		updatedFormElement.valid = this.checkValidity(
+			updatedFormElement.value,
+			updatedFormElement.validation
+		);
+		// Only activating validation (invalid styling) after touched the first time
+		updatedFormElement.touched = true;
+		console.log(updatedFormElement);
 		updatedOrderForm[inputID] = updatedFormElement;
-		this.setState({ orderForm: updatedOrderForm });
+
+		// Looping through all the elements to check if everything is valid
+		let formIsValid = true;
+		for (let inputIdentifier in updatedOrderForm) {
+			formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid; // To check if prev value of formIsValid is also true
+		}
+
+		this.setState({ orderForm: updatedOrderForm, formIsValid: formIsValid });
 	};
 
 	render() {
@@ -116,14 +185,20 @@ class ContactData extends Component {
 							key={formElement.id}
 							elementType={formElement.config.elementType}
 							elementConfig={formElement.config.elementConfig}
+							// valueType={formElement.config.elementConfig}
 							value={formElement.config.value}
+							invalid={!formElement.config.valid}
+							shouldValidate={formElement.config.validation} //To remove validation from dropdown
+							touched={formElement.config.touched}
 							changed={(e) => {
 								this.inputChangedHandler(e, formElement.id);
 							}}
 						/>
 					);
 				})}
-				<Button btnType="Success">ORDER</Button>
+				<Button btnType="Success" disabled={!this.state.formIsValid}>
+					ORDER
+				</Button>
 			</form>
 		);
 		if (this.state.loading) {
