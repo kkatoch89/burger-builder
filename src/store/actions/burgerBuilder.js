@@ -29,6 +29,7 @@ export const fetchIngredientsFailed = () => {
 	};
 };
 
+// Async action creator
 export const initIngredients = () => {
 	return (dispatch) => {
 		axios
