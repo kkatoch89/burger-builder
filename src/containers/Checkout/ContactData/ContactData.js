@@ -3,6 +3,7 @@ import axios from '../../../axios-orders';
 import { connect } from 'react-redux';
 
 import styles from './ContactData.module.css';
+
 import Button from '../../../components/UI/Button/Button';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
@@ -112,7 +113,7 @@ class ContactData extends Component {
 			price: this.props.price,
 			orderData: formData,
 		};
-		this.props.onOrderBurger(order);
+		this.props.onOrderBurger(order, this.props.token);
 	};
 
 	checkValidity(value, rules) {
@@ -211,12 +212,14 @@ const mapStateToProps = (state) => {
 		ings: state.burgerBuilder.ingredients,
 		price: state.burgerBuilder.totalPrice,
 		loading: state.order.loading,
+		token: state.auth.token,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData)),
+		onOrderBurger: (orderData, token) =>
+			dispatch(actions.purchaseBurger(orderData, token)),
 	};
 };
 
