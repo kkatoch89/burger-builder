@@ -9,6 +9,7 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
 import withErrorHandler from '../../../components/hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/index';
+import { updateObject, checkValidity } from '../../../shared/utility';
 
 class ContactData extends Component {
 	state = {
@@ -105,7 +106,6 @@ class ContactData extends Component {
 		e.preventDefault();
 		const formData = {};
 		for (let formElementID in this.state.orderForm) {
-			// console.log(this.state.orderForm)
 			formData[formElementID] = this.state.orderForm[formElementID].value;
 		}
 		const order = {
@@ -117,46 +117,23 @@ class ContactData extends Component {
 		this.props.onOrderBurger(order, this.props.token);
 	};
 
-	checkValidity(value, rules) {
-		let isValid = true;
-
-		if (rules.required) {
-			// value.trim() removes white space in the beginning and end
-			isValid = value.trim() !== '' && isValid; // && isValid is to check if isValid was already true
-		}
-
-		if (rules.minlength) {
-			isValid = value.length >= rules.minLength && isValid;
-		}
-
-		if (rules.maxLength) {
-			isValid = value.length <= rules.minLength && isValid;
-		}
-
-		return isValid;
-	}
-
-	inputChangedHandler = (e, inputID) => {
-		// Note that ...this.state.orderForm does not create a deep clone!!!
-		// The nested objects would still be a reference to the original nester objects
-		const updatedOrderForm = {
-			...this.state.orderForm,
-		};
+	inputChangedHandler = (e, inputId) => {
 		// Only need to create a deep copy until the level that you are changing value
-		const updatedFormElement = { ...updatedOrderForm[inputID] };
-		updatedFormElement.value = e.target.value;
-		// Checking to see if valid. If valid then true
-		updatedFormElement.valid = this.checkValidity(
-			updatedFormElement.value,
-			updatedFormElement.validation
-		);
-		// Only activating validation (invalid styling) after touched the first time
-		updatedFormElement.touched = true;
-		// console.log(updatedFormElement);
-		updatedOrderForm[inputID] = updatedFormElement;
+		const updatedFormElement = updateObject(this.state.orderForm[inputId], {
+			value: e.target.value,
+			valid: checkValidity(
+				e.target.value,
+				this.state.orderForm[inputId].validation
+			),
+			touched: true,
+		});
 
-		// Looping through all the elements to check if everything is valid
+		const updatedOrderForm = updateObject(this.state.orderForm, {
+			[inputId]: updatedFormElement,
+		});
+
 		let formIsValid = true;
+
 		for (let inputIdentifier in updatedOrderForm) {
 			formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid; // To check if prev value of formIsValid is also true
 		}
