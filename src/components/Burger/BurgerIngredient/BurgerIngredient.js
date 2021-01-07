@@ -31,6 +31,8 @@ class BurgerIngredient extends Component {
 			case 'lettuce':
 				ingredient = <div className={styles.Salad}></div>;
 				break;
+			default:
+				ingredient = null;
 		}
 		return ingredient;
 	}

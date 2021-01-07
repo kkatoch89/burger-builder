@@ -1,30 +1,11 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
 import ContactData from './ContactData/ContactData';
 
 class Checkout extends Component {
-	state = {
-		ingredients: {},
-		totalPrice: 0,
-	};
-
-	componentDidMount() {
-		const query = new URLSearchParams(this.props.location.search);
-		const customIngredients = {};
-		let price = 0;
-		for (let param of query.entries()) {
-			// console.log(param);
-			if (param[0] === 'price') {
-				price = param[1];
-			} else {
-				customIngredients[param[0]] = +param[1];
-			}
-		}
-		this.setState({ ingredients: customIngredients, totalPrice: price });
-	}
-
 	checkoutCancelledHandler = () => {
 		this.props.history.goBack();
 	};
@@ -34,26 +15,36 @@ class Checkout extends Component {
 	};
 
 	render() {
-		return (
-			<div>
-				<CheckoutSummary
-					ingredients={this.state.ingredients}
-					checkoutCancelled={this.checkoutCancelledHandler}
-					checkoutContinued={this.checkoutContinuedHandler}
-				/>
-				<Route
-					path={`${this.props.match.url}/contact-data`}
-					render={(props) => (
-						<ContactData
-							ingredients={this.state.ingredients}
-							price={this.state.totalPrice}
-							{...props}
-						/>
-					)}
-				/>
-			</div>
-		);
+		// Before returning render, if there aren't any ingredients, we go to homepage
+		let summary = <Redirect to="/" />;
+		if (this.props.ings) {
+			const purchasedRedirect = this.props.purchased ? (
+				<Redirect to="/" />
+			) : null;
+			summary = (
+				<div>
+					{purchasedRedirect}
+					<CheckoutSummary
+						ingredients={this.props.ings}
+						checkoutCancelled={this.checkoutCancelledHandler}
+						checkoutContinued={this.checkoutContinuedHandler}
+					/>
+					<Route
+						path={`${this.props.match.url}/contact-data`}
+						component={ContactData}
+					/>
+				</div>
+			);
+		}
+		return summary;
 	}
 }
 
-export default Checkout;
+const mapStateToProps = (state) => {
+	return {
+		ings: state.burgerBuilder.ingredients,
+		purchased: state.order.purchased,
+	};
+};
+
+export default connect(mapStateToProps)(Checkout);
