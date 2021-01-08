@@ -13,10 +13,12 @@ import * as actions from '../../store/actions/index';
 const BurgerBuilder = (props) => {
 	const [purchasing, setPurchasing] = useState(false);
 
+	const { onInitIngredients } = props;
+
 	useEffect(() => {
 		// Dispatch action to initialize ingredients
-		props.onInitIngredients();
-	}, [props]);
+		onInitIngredients();
+	}, [onInitIngredients]);
 
 	// Using the ingredients parameter because it was using the old state
 	// so in the add/remove handlers, because they update the state, we
