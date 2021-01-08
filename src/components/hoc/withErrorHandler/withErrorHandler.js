@@ -32,7 +32,7 @@ const withErrorHandler = (WrappedComponent, axios) => {
 				axios.interceptors.request.eject(reqInterceptor);
 				axios.interceptors.request.eject(resInterceptor);
 			};
-		}, [reqInterceptor, resInterceptor]);
+		}, [reqInterceptor, resInterceptor, props]);
 
 		// User can click on backdrop and exit the error message modal
 		const errorConfirmedHandler = () => {
